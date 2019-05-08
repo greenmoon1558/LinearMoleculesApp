@@ -1,0 +1,10 @@
+C:\Users\natai\source\repos\LinearMoleculesApp\LinearMoleculesApp\bin\Debug\LinearMoleculesApp.exe.config
+C:\Users\natai\source\repos\LinearMoleculesApp\LinearMoleculesApp\bin\Debug\LinearMoleculesApp.exe
+C:\Users\natai\source\repos\LinearMoleculesApp\LinearMoleculesApp\bin\Debug\LinearMoleculesApp.pdb
+C:\Users\natai\source\repos\LinearMoleculesApp\LinearMoleculesApp\obj\Debug\LinearMoleculesApp.csprojAssemblyReference.cache
+C:\Users\natai\source\repos\LinearMoleculesApp\LinearMoleculesApp\obj\Debug\LinearMoleculesApp.Form1.resources
+C:\Users\natai\source\repos\LinearMoleculesApp\LinearMoleculesApp\obj\Debug\LinearMoleculesApp.Properties.Resources.resources
+C:\Users\natai\source\repos\LinearMoleculesApp\LinearMoleculesApp\obj\Debug\LinearMoleculesApp.csproj.GenerateResource.cache
+C:\Users\natai\source\repos\LinearMoleculesApp\LinearMoleculesApp\obj\Debug\LinearMoleculesApp.csproj.CoreCompileInputs.cache
+C:\Users\natai\source\repos\LinearMoleculesApp\LinearMoleculesApp\obj\Debug\LinearMoleculesApp.exe
+C:\Users\natai\source\repos\LinearMoleculesApp\LinearMoleculesApp\obj\Debug\LinearMoleculesApp.pdb
