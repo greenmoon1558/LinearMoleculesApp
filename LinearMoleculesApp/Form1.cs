@@ -27,35 +27,119 @@ namespace LinearMoleculesApp
 
         // Selected hexagons.
         private List<PointF> Hexagons = new List<PointF>();
+        int hexagonsIndex = 1;
+        private List<(PointF, PointF)> hexNumbers = new List<(PointF, PointF)>();
+        private List<(PointF, PointF)> connections = new List<(PointF, PointF)>();
+        private List<(PointF, int)> pointToIndex = new List<(PointF, int)>();
 
 #if FIG34
         // The selected search rectangle.
         // Used to draw Figures 3 and 4.
         private List<RectangleF> TestRects = new List<RectangleF>();
 #endif
+        private void setMatrixUsigHex(List<(int, int)> intsConnections)
+        {
+            if (n != 0)
+            {
+                textBox1.Text += q + "Задається випадковими числами матриця..." + "\r\n";
+                progressBar1.Show();
+                progressBar1.Maximum = n * n;
+                progressBar1.Value = 0;
+                Random x = new Random();
+                for (short i = 0; i < n; i++)
+                  // var rows = intsConnections.FindAll(conns => (conns.Item1 == i+1) || (conns.Item2 == i+1));
 
+                    for (short j = (short)(i + 1); j < n; j++)
+                    {
+                        progressBar1.Value++;
+                        if (intsConnections.FindAll(conns =>
+                        ((conns.Item1 == i) && (conns.Item2 == j)) ||
+                        ((conns.Item2 == i) && (conns.Item1 == j))).Count != 0)
+                        {
+                            dataGridView1[i, j].Value = 1;
+                        }
+                        //x.Next(0, 20);
+                        dataGridView1[j, i].Value = dataGridView1[i, j].Value;
+                        textBox1.Text += "Додано ребро: (" + i.ToString() + "; " + j.ToString() + ") вагою " + dataGridView1[i, j].Value + "\r\n";
+                    }
+
+                progressBar1.Value = progressBar1.Maximum;
+                progressBar1.Value = progressBar1.Minimum;
+                progressBar1.Hide();
+            }
+            else
+            {
+                textBox1.Text += q + "Збільшіть розмір матриці" + "\r\n";
+            }
+
+        }
         // Redraw the grid.
         private void picGrid_Paint(object sender, PaintEventArgs e)
         {
             e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
-
-            // Draw the selected hexagons.
-            foreach (PointF point in Hexagons)
-            {
-                e.Graphics.FillPolygon(Brushes.LightBlue,
-                    HexToPoints(HexHeight, point.X, point.Y));
-            }
-
             // Draw the grid.
-            DrawHexGrid(e.Graphics, Pens.Black,
+            DrawHexGrid(e.Graphics, Pens.LightGray,
                 0, picGrid.ClientSize.Width,
                 0, picGrid.ClientSize.Height,
                 HexHeight);
+            // Draw the selected hexagons.
+            hexagonsIndex = 1;
+            hexNumbers = new List<(PointF, PointF)>();
+            connections = new List<(PointF, PointF)>();
+            pointToIndex = new List<(PointF, int)>();
+            foreach (PointF point in Hexagons)
+            {
+                PointF[] points = HexToPoints(HexHeight, point.X, point.Y);
+                e.Graphics.FillPolygon(Brushes.LightBlue, points);
+                e.Graphics.DrawPolygon(Pens.Black, points);
+                createConnection(points);
+                foreach ( (PointF realP, PointF drawingP) in HexToPointsForNumbers(HexHeight, point.X, point.Y))
+                {
+                    hexNumbers.Add((realP, drawingP));
+                    DrawStringFloatFormat(e, hexagonsIndex.ToString(), drawingP.X, drawingP.Y);
+                    pointToIndex.Add((realP, hexagonsIndex));
+                    hexagonsIndex++;
+                }
+            }
+            List<(int, int)> intsConnections = new List<(int, int)>();
+           // pointToIndex;
+            foreach ((PointF point1, PointF point2) in connections)
+            {
+                
+                var index1 = pointToIndex.Find(currPoint => ((currPoint.Item1.X == point1.X) && (currPoint.Item1.Y == point1.Y))).Item2;
+                var index2 = pointToIndex.Find(currPoint => ((currPoint.Item1.X == point2.X) && (currPoint.Item1.Y == point2.Y))).Item2;
+                intsConnections.Add((index1, index2));
+            }
+            numericUpDown1.Value = hexagonsIndex;
+            numericUpDown1_ValueChanged(sender, e);
+            setMatrixUsigHex(intsConnections);
         }
 
+        public void DrawStringFloatFormat(PaintEventArgs e,string drawString, float x, float y )
+        {
+            // Create font and brush.
+            Font drawFont = new Font("Arial", 9);
+            SolidBrush drawBrush = new SolidBrush(Color.Black);
+
+            // Set format of string.
+            StringFormat drawFormat = new StringFormat();
+            drawFormat.FormatFlags = StringFormatFlags.DisplayFormatControl;
+
+            // Draw string to screen.
+            e.Graphics.DrawString(drawString, drawFont, drawBrush, x, y, drawFormat);
+        }
         // Draw a hexagonal grid for the indicated area.
         // (You might be able to draw the hexagons without
         // drawing any duplicate edges, but this is a lot easier.)
+        private void createConnection(PointF[] points)
+        {
+            for (int i = 0; i < points.Count(); i++)
+            {
+                int next = 1 + i;
+                if (next == points.Count()) next = 0;
+                connections.Add((points[i], points[next]));
+            }
+        }
         private void DrawHexGrid(Graphics gr, Pen pen,
             float xmin, float xmax, float ymin, float ymax,
             float height)
@@ -65,7 +149,7 @@ namespace LinearMoleculesApp
             {
                 // Get the points for the row's first hexagon.
                 PointF[] points = HexToPoints(height, row, 0);
-
+                
                 // If it doesn't fit, we're done.
                 if (points[4].Y > ymax) break;
 
@@ -115,13 +199,24 @@ namespace LinearMoleculesApp
             PointToHex(e.X, e.Y, HexHeight, out row, out col);
             this.Text = "(" + row + ", " + col + ")";
         }
-
+        private bool isHexExist(float row, float col)
+        {
+            foreach(PointF point in Hexagons)
+            {
+                if (point.X == row && point.Y == col)
+                    return true;
+            }
+            return false;
+        }
         // Add the clicked hexagon to the Hexagons list.
         private void picGrid_MouseClick(object sender, MouseEventArgs e)
         {
             int row, col;
             PointToHex(e.X, e.Y, HexHeight, out row, out col);
-            Hexagons.Add(new PointF(row, col));
+            if (!isHexExist(row, col))
+                Hexagons.Add(new PointF(row, col));
+            else
+                Hexagons.Remove(new PointF(row, col));
 
 #if FIG34
             // Used to draw Figures 3 and 4.
@@ -130,6 +225,7 @@ namespace LinearMoleculesApp
                 points[0].X, points[1].Y,
                 0.75f * (points[3].X - points[0].X),
                 points[4].Y - points[1].Y));
+         
 #endif
 
             picGrid.Refresh();
@@ -196,9 +292,7 @@ namespace LinearMoleculesApp
                 col--;
             }
         }
-
-        // Return the points that define the indicated hexagon.
-        private PointF[] HexToPoints(float height, float row, float col)
+        private float[] getXYHeight(float height, float row, float col)
         {
             // Start with the leftmost corner of the upper left hexagon.
             float width = HexWidth(height);
@@ -213,6 +307,14 @@ namespace LinearMoleculesApp
 
             // Move over for the column number.
             x += col * (width * 0.75f);
+            return new float[] { x, y, width, height };
+        }
+        // Return the points that define the indicated hexagon.
+        private PointF[] HexToPoints(float height, float row, float col)
+        {
+            float[] arrXYWH = getXYHeight(height, row, col);
+            float x = arrXYWH[0], y = arrXYWH[1], width = arrXYWH[2];
+            height = arrXYWH[3];
 
             // Generate the points.
             return new PointF[]
@@ -225,6 +327,43 @@ namespace LinearMoleculesApp
                     new PointF(x + width * 0.25f, y + height / 2),
                 };
         }
+      
+        private List<(PointF, PointF)> HexToPointsForNumbers(float height, float row, float col)
+        {
+            float[] arrXYWH = getXYHeight(height, row, col);
+            float x = arrXYWH[0], y = arrXYWH[1], width = arrXYWH[2];
+            height = arrXYWH[3];
+            // Generate the points.
+            PointF[] realPoints = new PointF[]
+                {
+                    new PointF(x, y),
+                    new PointF(x + width * 0.25f, y - height / 2 ),
+                    new PointF(x + width * 0.75f, y - height / 2 ),
+                    new PointF(x + width, y),
+                    new PointF(x + width * 0.75f, y + height / 2),
+                    new PointF(x + width * 0.25f, y + height / 2),
+                };
+            PointF[] drawingPoints = new PointF[]
+               {
+                    new PointF(x + 2, y - 7),
+                    new PointF(x - 2 + width * 0.25f, y - height / 2 ),
+                    new PointF(x - 12 + width * 0.75f, y - height / 2 ),
+                    new PointF(x + width - 18, y - 7),
+                    new PointF(x - 12 + width * 0.75f, y - 14 + height / 2),
+                    new PointF(x - 2 + width * 0.25f, y - 14 + height / 2),
+               };
+            List<(PointF, PointF)> resultPoints = new List<(PointF, PointF)>();
+            for (int i = 0; i < realPoints.Count(); i++) {
+                if (hexNumbers.FindAll(currPoint => ((currPoint.Item1.X == realPoints[i].X)
+                && (currPoint.Item1.Y == realPoints[i].Y))).Count == 0)
+                {
+                    resultPoints.Add((realPoints[i], drawingPoints[i]));
+                }
+            }
+            return resultPoints;
+
+
+            }
 
         private void numericUpDown1_ValueChanged(object sender, EventArgs e)
         {
@@ -311,7 +450,8 @@ namespace LinearMoleculesApp
 
         private void button2_Click(object sender, EventArgs e)
         {
-            double[,] matrixArray = new double[dataGridView1.RowCount, dataGridView1.ColumnCount+2];
+            textBox1.Text = "";
+           double[,] matrixArray = new double[dataGridView1.RowCount, dataGridView1.ColumnCount+2];
             for (int i = 0; i < dataGridView1.RowCount; i++)
             {
                 for (int j = 0; j < dataGridView1.ColumnCount; j++)

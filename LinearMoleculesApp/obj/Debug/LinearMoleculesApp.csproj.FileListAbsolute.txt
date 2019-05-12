@@ -8,3 +8,6 @@ C:\Users\natai\source\repos\LinearMoleculesApp\LinearMoleculesApp\obj\Debug\Line
 C:\Users\natai\source\repos\LinearMoleculesApp\LinearMoleculesApp\obj\Debug\LinearMoleculesApp.csproj.CoreCompileInputs.cache
 C:\Users\natai\source\repos\LinearMoleculesApp\LinearMoleculesApp\obj\Debug\LinearMoleculesApp.exe
 C:\Users\natai\source\repos\LinearMoleculesApp\LinearMoleculesApp\obj\Debug\LinearMoleculesApp.pdb
+C:\Users\natai\source\repos\LinearMoleculesApp\LinearMoleculesApp\bin\Debug\System.ValueTuple.dll
+C:\Users\natai\source\repos\LinearMoleculesApp\LinearMoleculesApp\bin\Debug\System.ValueTuple.xml
+C:\Users\natai\source\repos\LinearMoleculesApp\LinearMoleculesApp\obj\Debug\LinearMoleculesApp.csproj.CopyComplete
