@@ -53,8 +53,8 @@ namespace LinearMoleculesApp
                     {
                         progressBar1.Value++;
                         if (intsConnections.FindAll(conns =>
-                        ((conns.Item1 == (1+i)) && (conns.Item2 == (1+j))) ||
-                        ((conns.Item2 == (1+i)) && (conns.Item1 == (1+j)))).Count != 0)
+                        ((conns.Item1 == (i)) && (conns.Item2 == (j))) ||
+                        ((conns.Item2 == (i)) && (conns.Item1 == (j)))).Count != 0)
                         {
                             dataGridView1[i, j].Value = 1;
                         }
