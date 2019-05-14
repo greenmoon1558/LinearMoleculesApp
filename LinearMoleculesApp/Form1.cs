@@ -466,10 +466,15 @@ namespace LinearMoleculesApp
             }
             try
             {
-                double[] results = LinearEquationSolver.Solve(matrixArray);
-                for(int i = 0; i<results.Length; i++)
+                double[,] results = LinearEquationSolver.Solve(matrixArray);
+
+                for(int i = 0; i<results.GetLength(1); i++)
                 {
-                    textBox1.Text += "x"+i.ToString()+"="+results[i] + " \r\n";
+                    for (int j = results.GetLength(0)-1; j >= 0; j--)
+                    {
+                        textBox1.Text += "x" + j.ToString() + "=" + results[j, i] + ",  ";
+                    }
+                    textBox1.Text += "\r\n";
                 }
             }
             catch (Exception ex)
